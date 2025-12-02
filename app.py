@@ -80,105 +80,150 @@ app = Dash(__name__)
 neigh_options = sorted(data["neighbourhood_cleansed"].dropna().unique())
 ptype_options = sorted(data["property_type_simple"].dropna().unique())
 
-app.layout = html.Div([
-    html.H2("Tablero Airbnb – Predicción de precio y recomendación"),
+app.layout = html.Div(
+    [
+        html.H2("Tablero Airbnb – Predicción de precio y recomendación"),
 
-    html.Div([
-        # PANEL IZQUIERDO – Inputs
-        html.Div([
-            html.H4("Describe tu alojamiento"),
+        # CONTENEDOR SUPERIOR: inputs + resultados
+        html.Div(
+            [
+                # PANEL IZQUIERDO – Inputs
+                html.Div(
+                    [
+                        html.H4("Describe tu alojamiento"),
 
-            html.Label("Barrio"),
-            dcc.Dropdown(
-                id="inp-neighbourhood",
-                options=[{"label": n, "value": n} for n in neigh_options],
-                value=neigh_options[0]
-            ),
+                        html.Label("Barrio"),
+                        dcc.Dropdown(
+                            id="inp-neighbourhood",
+                            options=[{"label": n, "value": n} for n in neigh_options],
+                            value=neigh_options[0],
+                        ),
 
-            html.Label("Tipo de propiedad"),
-            dcc.Dropdown(
-                id="inp-property-type",
-                options=[{"label": p, "value": p} for p in ptype_options],
-                value=ptype_options[0]
-            ),
+                        html.Label("Tipo de propiedad"),
+                        dcc.Dropdown(
+                            id="inp-property-type",
+                            options=[{"label": p, "value": p} for p in ptype_options],
+                            value=ptype_options[0],
+                        ),
 
-            html.Label("Superhost"),
-            dcc.Dropdown(
-                id="inp-superhost",
-                options=[
-                    {"label": "Sí", "value": "t"},
-                    {"label": "No", "value": "f"},
-                ],
-                value="f"
-            ),
+                        html.Label("Superhost"),
+                        dcc.Dropdown(
+                            id="inp-superhost",
+                            options=[
+                                {"label": "Sí", "value": "t"},
+                                {"label": "No", "value": "f"},
+                            ],
+                            value="f",
+                        ),
 
-            html.Label("Huéspedes (accommodates)"),
-            dcc.Input(id="inp-accommodates", type="number", value=2),
+                        html.Label("Huéspedes (accommodates)"),
+                        dcc.Input(id="inp-accommodates", type="number", value=2),
 
-            html.Label("Habitaciones (bedrooms)"),
-            dcc.Input(id="inp-bedrooms", type="number", value=1),
+                        html.Label("Habitaciones (bedrooms)"),
+                        dcc.Input(id="inp-bedrooms", type="number", value=1),
 
-            html.Label("Camas (beds)"),
-            dcc.Input(id="inp-beds", type="number", value=1),
+                        html.Label("Camas (beds)"),
+                        dcc.Input(id="inp-beds", type="number", value=1),
 
-            html.Label("Noche mínima"),
-            dcc.Input(id="inp-min-nights", type="number", value=1),
+                        html.Label("Noche mínima"),
+                        dcc.Input(id="inp-min-nights", type="number", value=1),
 
-            html.Label("Noche máxima"),
-            dcc.Input(id="inp-max-nights", type="number", value=30),
+                        html.Label("Noche máxima"),
+                        dcc.Input(id="inp-max-nights", type="number", value=30),
 
-            html.Label("Precio por persona"),
-            dcc.Input(id="inp-price-pp", type="number", value=100000),
+                        html.Label("Precio por persona"),
+                        dcc.Input(id="inp-price-pp", type="number", value=100000),
 
-            html.Label("Tasa de ocupación (0–1)"),
-            dcc.Slider(id="inp-occ", min=0, max=1, step=0.01, value=0.7),
+                        html.Label("Tasa de ocupación (0–1)"),
+                        dcc.Slider(id="inp-occ", min=0, max=1, step=0.01, value=0.7),
 
-            html.Label("Número de reseñas"),
-            dcc.Input(id="inp-nreviews", type="number", value=10),
+                        html.Label("Número de reseñas"),
+                        dcc.Input(id="inp-nreviews", type="number", value=10),
 
-            html.Label("Calificación promedio (0–5)"),
-            dcc.Slider(id="inp-score", min=0, max=5, step=0.1, value=4.7),
+                        html.Label("Calificación promedio (0–5)"),
+                        dcc.Slider(id="inp-score", min=0, max=5, step=0.1, value=4.7),
 
-            html.Label("Reseñas por mes"),
-            dcc.Input(id="inp-rpm", type="number", value=0.5),
+                        html.Label("Reseñas por mes"),
+                        dcc.Input(id="inp-rpm", type="number", value=0.5),
 
-            html.Label("Número de listings del host"),
-            dcc.Input(id="inp-host-listings", type="number", value=1),
+                        html.Label("Número de listings del host"),
+                        dcc.Input(id="inp-host-listings", type="number", value=1),
 
-            html.Br(),
-            html.Button("Calcular", id="btn-calc", n_clicks=0),
+                        html.Br(),
+                        html.Button("Calcular", id="btn-calc", n_clicks=0),
+                    ],
+                    style={
+                        "width": "35%",
+                        "display": "inline-block",
+                        "verticalAlign": "top",
+                        "padding": "10px",
+                    },
+                ),
 
-        ], style={"width": "30%", "display": "inline-block", "verticalAlign": "top", "padding": "10px"}),
-
-        # PANEL DERECHO – Resultados
-        html.Div([
-            html.H4("Resultados del modelo"),
-            html.Div(id="predicted-price", style={"fontSize": "20px", "marginBottom": "10px"}),
-            html.Div(id="predicted-recommended", style={"fontSize": "18px"}),
-            html.Hr(),
-            html.Div(id="interpretacion"),
-        ], style={"width": "68%", "display": "inline-block", "padding": "10px"}),
-    ]),
-
-    html.Hr(),
-
-    # VISUALIZACIONES
-    html.Div([
-        html.H3("Visualizaciones de contexto"),
-
-        dcc.Dropdown(
-            id="filtro-barrio",
-            options=[{"label": "Todos", "value": "ALL"}] +
-                    [{"label": n, "value": n} for n in neigh_options],
-            value="ALL",
-            style={"width": "300px"}
+                # PANEL DERECHO – Resultados
+                html.Div(
+                    [
+                        html.H4("Resultados del modelo"),
+                        html.Div(
+                            id="predicted-price",
+                            style={"fontSize": "20px", "marginBottom": "10px"},
+                        ),
+                        html.Div(
+                            id="predicted-recommended",
+                            style={"fontSize": "18px", "marginBottom": "10px"},
+                        ),
+                        html.Hr(),
+                        html.Div(id="interpretacion"),
+                    ],
+                    style={
+                        "width": "60%",
+                        "display": "inline-block",
+                        "padding": "10px",
+                    },
+                ),
+            ],
+            style={
+                "display": "flex",
+                "gap": "40px",
+                "alignItems": "flex-start",
+            },
         ),
 
-        dcc.Graph(id="mapa-listings"),
-        dcc.Graph(id="precio-por-barrio"),
-        dcc.Graph(id="scatter-score-price")
-    ])
-])
+        html.Hr(),
+
+        # VISUALIZACIONES
+        html.Div(
+            [
+                html.H3("Visualizaciones de contexto"),
+
+                dcc.Dropdown(
+                    id="filtro-barrio",
+                    options=[{"label": "Todos", "value": "ALL"}]
+                    + [{"label": n, "value": n} for n in neigh_options],
+                    value="ALL",
+                    style={"width": "300px", "marginBottom": "15px"},
+                ),
+
+                html.Div(
+                    [
+                        dcc.Graph(id="mapa-listings", style={"height": "350px"}),
+                        dcc.Graph(id="precio-por-barrio", style={"height": "350px"}),
+                        dcc.Graph(
+                            id="scatter-score-price", style={"height": "350px"}
+                        ),
+                    ],
+                    style={
+                        "display": "grid",
+                        "gridTemplateColumns": "repeat(3, 1fr)",
+                        "gap": "20px",
+                    },
+                ),
+            ],
+            style={"marginTop": "20px"},
+        ),
+    ],
+    style={"maxWidth": "1200px", "margin": "0 auto", "padding": "20px"},
+)
 
 # 4. Callback para predecir
 @app.callback(
@@ -262,50 +307,58 @@ def hacer_prediccion(n_clicks, neigh, ptype, superhost, acc, bed, beds,
 
     return texto_price, texto_prob + " – " + mensaje, interpretacion
 
-# 5. Callbacks de visualizaciones
 @app.callback(
-    [Output("mapa-listings", "figure"),
-     Output("precio-por-barrio", "figure"),
-     Output("scatter-score-price", "figure")],
-    Input("filtro-barrio", "value")
+    [
+        Output("mapa-listings", "figure"),
+        Output("precio-por-barrio", "figure"),
+        Output("scatter-score-price", "figure"),
+    ],
+    Input("filtro-barrio", "value"),
 )
 def actualizar_graficas(filtro_barrio):
     dff = data.copy()
-    if filtro_barrio != "ALL":
+    if filtro_barrio not in (None, "ALL"):
         dff = dff[dff["neighbourhood_cleansed"] == filtro_barrio]
 
-    fig_map = px.scatter_mapbox(
-        dff,
-        lat="latitude",
-        lon="longitude",
-        color="occupancy_rate",
-        zoom=10,
-        height=400
-    )
-    fig_map.update_layout(mapbox_style="open-street-map")
+    # Si por alguna razón no hay datos para ese barrio:
+    if dff.empty:
+        return px.scatter(), px.bar(), px.scatter()
 
-    barrio_stats = data.groupby("neighbourhood_cleansed").agg(
+    # "Mapa" simplificado: lat vs lon
+    fig_map = px.scatter(
+        dff,
+        x="longitude",
+        y="latitude",
+        color="occupancy_rate",
+        hover_name="neighbourhood_cleansed",
+        title="Distribución de listings (longitud vs latitud)",
+        opacity=0.6,
+    )
+
+    # Precio promedio por barrio (usando solo dff)
+    barrio_stats = dff.groupby("neighbourhood_cleansed").agg(
         avg_price=("price", "mean"),
-        avg_occ=("occupancy_rate", "mean")
+        avg_occ=("occupancy_rate", "mean"),
     ).reset_index()
 
     fig_bar = px.bar(
         barrio_stats,
         x="neighbourhood_cleansed",
         y="avg_price",
-        title="Precio promedio por barrio"
+        title="Precio promedio por barrio",
     )
 
+    # Relación calificación vs precio por persona
     fig_scatter = px.scatter(
-        data,
+        dff,
         x="review_scores",
         y="price_per_person",
         color="recommended",
-        title="Relación entre calificación y precio por persona"
+        title="Calificación vs precio por persona",
+        opacity=0.6,
     )
 
     return fig_map, fig_bar, fig_scatter
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8050, debug=False)
