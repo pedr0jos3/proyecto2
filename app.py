@@ -1,11 +1,9 @@
-
 import pandas as pd
 import numpy as np
 import joblib
 
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras.models import load_model
 from tensorflow.keras import layers
 
 from dash import Dash, dcc, html, Input, Output, State
@@ -36,10 +34,45 @@ df = pd.get_dummies(df, columns=cat_features, drop_first=True)
 
 feature_cols = num_features + [c for c in df.columns if any(feat in c for feat in cat_features)]
 
-# 2. Cargar modelos y scaler
-reg_model = load_model("models/regression_model.h5")
-clf_model = load_model("models/classification_model.h5")
+# 2. Modelos y scaler 
+
+# Modelo de REGRESIÓN (misma arquitectura que en el notebook)
+reg_model = keras.Sequential([
+    layers.Input(shape=(len(feature_cols),), name="input_layer"),
+    layers.Dense(235, activation="relu"),
+    layers.Dropout(0.2),
+    layers.Dense(120, activation="relu"),
+    layers.Dense(1)
+])
+
+reg_model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=0.00047),
+    loss="mse",
+    metrics=["mae"]
+)
+
+# Modelo de CLASIFICACIÓN (misma arquitectura que en el notebook)
+clf_model = keras.Sequential([
+    layers.Input(shape=(len(feature_cols),), name="input_layer"),
+    layers.Dense(33, activation="relu"),
+    layers.Dropout(0.3),
+    layers.Dense(191, activation="relu"),
+    layers.Dense(1, activation="sigmoid")
+])
+
+clf_model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=0.000986),
+    loss="binary_crossentropy",
+    metrics=["accuracy"]
+)
+
+# Cargar pesos entrenados (ojo con los nombres)
+reg_model.load_weights("models/regression.weights.h5")
+clf_model.load_weights("models/classification.weights.h5")
+
+# Cargar scaler
 scaler = joblib.load("models/scaler.pkl")
+
 
 # 3. Crear app Dash
 app = Dash(__name__)
