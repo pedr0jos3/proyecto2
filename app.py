@@ -185,8 +185,8 @@ app.layout = html.Div([
     [Output("predicted-price", "children"),
      Output("predicted-recommended", "children"),
      Output("interpretacion", "children")],
-    Input("btn-calc", "n_clicks"),
-    state=[
+    [Input("btn-calc", "n_clicks")],
+    [
         State("inp-neighbourhood", "value"),
         State("inp-property-type", "value"),
         State("inp-superhost", "value"),
