@@ -13,6 +13,9 @@ import plotly.express as px
 data = pd.read_csv("listings_cleaned.csv")
 data["review_scores"] = data["review_scores"].astype(float)
 
+if "price_per_person" not in data.columns:
+    data["price_per_person"] = data["price"] / data["accommodates"]
+
 df = data.copy()
 df["recommended"] = (
     (df["occupancy_rate"] >= 0.65) &
@@ -317,14 +320,17 @@ def hacer_prediccion(n_clicks, neigh, ptype, superhost, acc, bed, beds,
 )
 def actualizar_graficas(filtro_barrio):
     dff = data.copy()
-    if filtro_barrio not in (None, "ALL"):
-        dff = dff[dff["neighbourhood_cleansed"] == filtro_barrio]
 
-    # Si por alguna razón no hay datos para ese barrio:
+    # 1. Aplicar filtro solo si es un barrio válido distinto de "ALL"
+    if filtro_barrio and filtro_barrio != "ALL":
+        if filtro_barrio in dff["neighbourhood_cleansed"].unique():
+            dff = dff[dff["neighbourhood_cleansed"] == filtro_barrio]
+
+    # 2. Si por cualquier razón quedó vacío, usar todo el dataset
     if dff.empty:
-        return px.scatter(), px.bar(), px.scatter()
+        dff = data.copy()
 
-    # "Mapa" simplificado: lat vs lon
+    # 3. Gráfica 1 – "Mapa" simplificado: longitud vs latitud
     fig_map = px.scatter(
         dff,
         x="longitude",
@@ -335,7 +341,7 @@ def actualizar_graficas(filtro_barrio):
         opacity=0.6,
     )
 
-    # Precio promedio por barrio (usando solo dff)
+    # 4. Gráfica 2 – Precio promedio por barrio (sobre el dff filtrado)
     barrio_stats = dff.groupby("neighbourhood_cleansed").agg(
         avg_price=("price", "mean"),
         avg_occ=("occupancy_rate", "mean"),
@@ -348,7 +354,7 @@ def actualizar_graficas(filtro_barrio):
         title="Precio promedio por barrio",
     )
 
-    # Relación calificación vs precio por persona
+    # 5. Gráfica 3 – Calificación vs precio por persona
     fig_scatter = px.scatter(
         dff,
         x="review_scores",
