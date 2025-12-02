@@ -3,5 +3,7 @@ pandas
 numpy
 plotly
 tensorflow==2.15.0
+keras==2.15.0
 scikit-learn
 joblib
+h5py

@@ -1,12 +1,13 @@
 FROM python:3.10-slim
 
+# Forzar a TensorFlow a usar el Keras legacy
+ENV TF_USE_LEGACY_KERAS=1
+
 WORKDIR /app
 
-# Copiar requisitos e instalarlos
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar todo el proyecto (app.py, models/, listings_cleaned.csv, etc.)
 COPY . .
 
 EXPOSE 8050
