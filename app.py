@@ -37,6 +37,40 @@ df = pd.get_dummies(df, columns=cat_features, drop_first=True)
 
 feature_cols = num_features + [c for c in df.columns if any(feat in c for feat in cat_features)]
 
+# 1. "Mapa" simplificado: longitud vs latitud coloreado por tasa de ocupación
+fig_mapa = px.scatter(
+    data,
+    x="longitude",
+    y="latitude",
+    color="occupancy_rate",
+    hover_name="neighbourhood_cleansed",
+    title="Distribución de listings (longitud vs latitud)",
+    opacity=0.6,
+)
+
+# 2. Precio promedio por barrio
+barrio_stats = data.groupby("neighbourhood_cleansed").agg(
+    avg_price=("price", "mean"),
+    avg_occ=("occupancy_rate", "mean"),
+).reset_index()
+
+fig_barrios = px.bar(
+    barrio_stats,
+    x="neighbourhood_cleansed",
+    y="avg_price",
+    title="Precio promedio por barrio",
+)
+
+# 3. Relación calificación vs precio por persona con 'recommended'
+fig_scatter = px.scatter(
+    df,  # usamos df porque tiene 'recommended'
+    x="review_scores",
+    y="price_per_person",
+    color="recommended",
+    title="Calificación vs precio por persona (según 'recommended')",
+    opacity=0.6,
+)
+
 # 2. Modelos y scaler 
 
 # Modelo de REGRESIÓN (misma arquitectura que en el notebook)
@@ -304,23 +338,13 @@ app.layout = html.Div(
             [
                 html.H3("Visualizaciones de contexto"),
 
-                dcc.Dropdown(
-                    id="filtro-barrio",
-                    options=[{"label": "Todos", "value": "ALL"}]
-                    + [
-                        {"label": n, "value": n}
-                        for n in neigh_options
-                    ],
-                    value="ALL",
-                    style={"width": "300px", "marginBottom": "15px"},
-                ),
-
                 html.Div(
                     [
-                        dcc.Graph(id="mapa-listings", style={"height": "350px"}),
-                        dcc.Graph(id="precio-por-barrio", style={"height": "350px"}),
+                        dcc.Graph(id="mapa-listings", figure=fig_mapa, style={"height": "350px"}),
+                        dcc.Graph(id="precio-por-barrio", figure=fig_barrios, style={"height": "350px"}),
                         dcc.Graph(
                             id="scatter-score-price",
+                            figure=fig_scatter,
                             style={"height": "350px"},
                         ),
                     ],
@@ -333,6 +357,7 @@ app.layout = html.Div(
             ],
             style={"marginTop": "20px"},
         ),
+
     ],
     style={"maxWidth": "1200px", "margin": "0 auto", "padding": "20px"},
 )
@@ -418,62 +443,6 @@ def hacer_prediccion(n_clicks, neigh, ptype, superhost, acc, bed, beds,
     )
 
     return texto_price, texto_prob + " – " + mensaje, interpretacion
-
-@app.callback(
-    [
-        Output("mapa-listings", "figure"),
-        Output("precio-por-barrio", "figure"),
-        Output("scatter-score-price", "figure"),
-    ],
-    Input("filtro-barrio", "value"),
-)
-def actualizar_graficas(filtro_barrio):
-    dff = df.copy()
-
-    # 1. Aplicar filtro solo si es un barrio válido distinto de "ALL"
-    if filtro_barrio and filtro_barrio != "ALL":
-        if filtro_barrio in dff["neighbourhood_cleansed"].unique():
-            dff = dff[dff["neighbourhood_cleansed"] == filtro_barrio]
-
-    # 2. Si por cualquier razón quedó vacío, volver a df completo
-    if dff.empty:
-        dff = df.copy()
-
-    # 3. Gráfica 1 – "Mapa" simplificado: longitud vs latitud
-    fig_map = px.scatter(
-        dff,
-        x="longitude",
-        y="latitude",
-        color="occupancy_rate",
-        hover_name="neighbourhood_cleansed",
-        title="Distribución de listings (longitud vs latitud)",
-        opacity=0.6,
-    )
-
-    # 4. Gráfica 2 – Precio promedio por barrio
-    barrio_stats = dff.groupby("neighbourhood_cleansed").agg(
-        avg_price=("price", "mean"),
-        avg_occ=("occupancy_rate", "mean"),
-    ).reset_index()
-
-    fig_bar = px.bar(
-        barrio_stats,
-        x="neighbourhood_cleansed",
-        y="avg_price",
-        title="Precio promedio por barrio",
-    )
-
-    # 5. Gráfica 3 – Calificación vs precio por persona
-    fig_scatter = px.scatter(
-        dff,
-        x="review_scores",
-        y="price_per_person",
-        color="recommended",  # ahora sí existe en dff
-        title="Calificación vs precio por persona",
-        opacity=0.6,
-    )
-
-    return fig_map, fig_bar, fig_scatter
 
 
 if __name__ == "__main__":
