@@ -316,7 +316,7 @@ def hacer_prediccion(n_clicks, neigh, ptype, superhost, acc, bed, beds,
     prob_rec = float(clf_model.predict(X_scaled)[0][0])
 
     texto_price = f"Precio recomendado: €{price_pred:,.0f}"
-    #texto_prob = f"Probabilidad de ser 'recommended': {prob_rec*100:,.1f}%"
+    texto_prob = f"Probabilidad de ser 'recommended': {prob_rec*100:,.1f}%"
 
     if prob_rec == 1:
         mensaje = "Alta probabilidad de estar bien posicionado."
@@ -331,7 +331,7 @@ def hacer_prediccion(n_clicks, neigh, ptype, superhost, acc, bed, beds,
         f"probabilidad de {prob_rec*100:,.1f}% de que el anuncio sea recomendado."
     )
 
-    return texto_price + mensaje, interpretacion
+    return texto_price, texto_prob + " – "  + mensaje, interpretacion
 
 
 if __name__ == "__main__":
