@@ -225,11 +225,12 @@ app.layout = html.Div(
                             [
                                 dcc.Graph(id="mapa-listings", figure=fig_mapa, style={"height": "380px"}),
                                 dcc.Graph(id="precio-por-barrio", figure=fig_barrios, style={"height": "380px"}),
-                                dcc.Graph(id="scatter-score-price", figure=fig_scatter, style={"height": "380px"}),
+                                dcc.Graph(id="scatter-score-price", figure=fig_scatter, style={"height": "400px", "gridColumn": "1 / span 2"}),
                             ],
                             style={
                                 "display": "grid",
-                                "gridTemplateColumns": "1fr 1fr 1fr",
+                                "gridTemplateColumns": "1fr 1fr",  
+                                "gridTemplateRows": "auto auto",  
                                 "gap": "20px",
                             },
                         ),
