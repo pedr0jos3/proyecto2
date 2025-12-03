@@ -171,13 +171,13 @@ app.layout = html.Div(
                                         dcc.Input(id="inp-price-pp", type="number", value=100000, style={"width": "100%"}),
 
                                         html.Label("Tasa de ocupación"),
-                                        dcc.Slider(id="inp-occ", min=0, max=1, step=0.01, value=0.7),
+                                        dcc.Slider(id="inp-occ", min=0, max=1, step=0.01, value=0.7, tooltip={"placement": "bottom", "always_visible": True}, marks={}),
 
                                         html.Label("Número de reseñas"),
                                         dcc.Input(id="inp-nreviews", type="number", value=10, style={"width": "100%"}),
 
                                         html.Label("Calificación promedio"),
-                                        dcc.Slider(id="inp-score", min=0, max=5, step=0.1, value=4.7),
+                                        dcc.Slider(id="inp-score", min=0, max=5, step=0.1, value=4.7, tooltip={"placement": "bottom", "always_visible": True}, marks={}),
 
                                         html.Label("Reseñas por mes"),
                                         dcc.Input(id="inp-rpm", type="number", value=1, style={"width": "100%"}),
@@ -316,7 +316,7 @@ def hacer_prediccion(n_clicks, neigh, ptype, superhost, acc, bed, beds,
     prob_rec = float(clf_model.predict(X_scaled)[0][0])
 
     texto_price = f"Precio recomendado: €{price_pred:,.0f}"
-    texto_prob = f"Probabilidad de ser 'recommended': {prob_rec*100:,.1f}%"
+    #texto_prob = f"Probabilidad de ser 'recommended': {prob_rec*100:,.1f}%"
 
     if prob_rec == 1:
         mensaje = "Alta probabilidad de estar bien posicionado."
@@ -327,11 +327,11 @@ def hacer_prediccion(n_clicks, neigh, ptype, superhost, acc, bed, beds,
 
     interpretacion = (
         f"Para un alojamiento en {neigh} de tipo {ptype} con capacidad para {acc} huésped(es), "
-        f"el modelo sugiere un precio alrededor de €{price_pred:,.0f} y estima una "
-        f"probabilidad de {prob_rec*100:,.1f}% de que el anuncio sea recomendado."
+        f"el modelo sugiere un precio alrededor de €{price_pred:,.0f} y estima una {'alta' if prob_rec == 1 else 'baja'} "
+        f"probabilidad de que el anuncio sea recomendado."
     )
 
-    return texto_price, texto_prob + " – " + mensaje, interpretacion
+    return texto_price + mensaje, interpretacion
 
 
 if __name__ == "__main__":
