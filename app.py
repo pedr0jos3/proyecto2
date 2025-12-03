@@ -428,18 +428,18 @@ def hacer_prediccion(n_clicks, neigh, ptype, superhost, acc, bed, beds,
     Input("filtro-barrio", "value"),
 )
 def actualizar_graficas(filtro_barrio):
-    # Usar df, que SÍ tiene 'recommended'
     dff = df.copy()
 
+    # 1. Aplicar filtro solo si es un barrio válido distinto de "ALL"
     if filtro_barrio and filtro_barrio != "ALL":
         if filtro_barrio in dff["neighbourhood_cleansed"].unique():
             dff = dff[dff["neighbourhood_cleansed"] == filtro_barrio]
 
-    # Si quedó vacío por alguna razón, usar todo df
+    # 2. Si por cualquier razón quedó vacío, volver a df completo
     if dff.empty:
         dff = df.copy()
 
-    # 1. "Mapa" simplificado: longitud vs latitud
+    # 3. Gráfica 1 – "Mapa" simplificado: longitud vs latitud
     fig_map = px.scatter(
         dff,
         x="longitude",
@@ -450,7 +450,7 @@ def actualizar_graficas(filtro_barrio):
         opacity=0.6,
     )
 
-    # 2. Precio promedio por barrio (sobre dff filtrado)
+    # 4. Gráfica 2 – Precio promedio por barrio
     barrio_stats = dff.groupby("neighbourhood_cleansed").agg(
         avg_price=("price", "mean"),
         avg_occ=("occupancy_rate", "mean"),
@@ -463,17 +463,18 @@ def actualizar_graficas(filtro_barrio):
         title="Precio promedio por barrio",
     )
 
-    # 3. Relación calificación vs precio por persona
+    # 5. Gráfica 3 – Calificación vs precio por persona
     fig_scatter = px.scatter(
         dff,
         x="review_scores",
         y="price_per_person",
-        color="recommended",  # ahora sí existe
+        color="recommended",  # ahora sí existe en dff
         title="Calificación vs precio por persona",
         opacity=0.6,
     )
 
     return fig_map, fig_bar, fig_scatter
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8050, debug=False)
