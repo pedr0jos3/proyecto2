@@ -93,8 +93,16 @@ app.layout = html.Div(
                 # PANEL IZQUIERDO – Inputs
                 html.Div(
                     [
-                        html.H4("Describe tu alojamiento"),
+                        # PANEL IZQUIERDO – Inputs (mejorado con grid)
+html.Div(
+    [
+        html.H4("Describe tu alojamiento"),
 
+        html.Div(
+            [
+                # COLUMNA 1
+                html.Div(
+                    [
                         html.Label("Barrio"),
                         dcc.Dropdown(
                             id="inp-neighbourhood",
@@ -120,76 +128,276 @@ app.layout = html.Div(
                         ),
 
                         html.Label("Huéspedes (accommodates)"),
-                        dcc.Input(id="inp-accommodates", type="number", value=2),
+                        dcc.Input(
+                            id="inp-accommodates",
+                            type="number",
+                            value=2,
+                            style={"width": "100%"},
+                        ),
 
                         html.Label("Habitaciones (bedrooms)"),
-                        dcc.Input(id="inp-bedrooms", type="number", value=1),
+                        dcc.Input(
+                            id="inp-bedrooms",
+                            type="number",
+                            value=1,
+                            style={"width": "100%"},
+                        ),
 
                         html.Label("Camas (beds)"),
-                        dcc.Input(id="inp-beds", type="number", value=1),
+                        dcc.Input(
+                            id="inp-beds",
+                            type="number",
+                            value=1,
+                            style={"width": "100%"},
+                        ),
+                    ],
+                    style={"display": "flex", "flexDirection": "column", "gap": "10px"},
+                ),
 
+                # COLUMNA 2
+                html.Div(
+                    [
                         html.Label("Noche mínima"),
-                        dcc.Input(id="inp-min-nights", type="number", value=1),
+                        dcc.Input(
+                            id="inp-min-nights",
+                            type="number",
+                            value=1,
+                            style={"width": "100%"},
+                        ),
 
                         html.Label("Noche máxima"),
-                        dcc.Input(id="inp-max-nights", type="number", value=30),
+                        dcc.Input(
+                            id="inp-max-nights",
+                            type="number",
+                            value=30,
+                            style={"width": "100%"},
+                        ),
 
                         html.Label("Precio por persona"),
-                        dcc.Input(id="inp-price-pp", type="number", value=100000),
+                        dcc.Input(
+                            id="inp-price-pp",
+                            type="number",
+                            value=100000,
+                            style={"width": "100%"},
+                        ),
 
                         html.Label("Tasa de ocupación (0–1)"),
-                        dcc.Slider(id="inp-occ", min=0, max=1, step=0.01, value=0.7),
+                        dcc.Slider(
+                            id="inp-occ", min=0, max=1, step=0.01, value=0.7,
+                            tooltip={"placement": "bottom", "always_visible": True},
+                        ),
 
                         html.Label("Número de reseñas"),
-                        dcc.Input(id="inp-nreviews", type="number", value=10),
+                        dcc.Input(
+                            id="inp-nreviews",
+                            type="number",
+                            value=10,
+                            style={"width": "100%"},
+                        ),
 
                         html.Label("Calificación promedio (0–5)"),
-                        dcc.Slider(id="inp-score", min=0, max=5, step=0.1, value=4.7),
+                        dcc.Slider(
+                            id="inp-score", min=0, max=5, step=0.1, value=4.7,
+                            tooltip={"placement": "bottom", "always_visible": True},
+                        ),
 
                         html.Label("Reseñas por mes"),
-                        dcc.Input(id="inp-rpm", type="number", value=0.5),
+                        dcc.Input(
+                            id="inp-rpm",
+                            type="number",
+                            value=0.5,
+                            style={"width": "100%"},
+                        ),
 
                         html.Label("Número de listings del host"),
-                        dcc.Input(id="inp-host-listings", type="number", value=1),
-
-                        html.Br(),
-                        html.Button("Calcular", id="btn-calc", n_clicks=0),
+                        dcc.Input(
+                            id="inp-host-listings",
+                            type="number",
+                            value=1,
+                            style={"width": "100%"},
+                        ),
                     ],
-                    style={
-                        "width": "35%",
-                        "display": "inline-block",
-                        "verticalAlign": "top",
-                        "padding": "10px",
-                    },
+                    style={"display": "flex", "flexDirection": "column", "gap": "10px"},
+                ),
+            ],
+            style={
+                "display": "grid",
+                "gridTemplateColumns": "1fr 1fr",
+                "columnGap": "25px",
+                "rowGap": "15px",
+            },
+        ),
+
+        html.Br(),
+        html.Button("Calcular", id="btn-calc", n_clicks=0),
+    ],
+    style={
+        "width": "40%",
+        "display": "inline-block",
+        "verticalAlign": "top",
+        "padding": "15px",
+        "border": "1px solid #ddd",
+        "borderRadius": "10px",
+        "backgroundColor": "#fafafa",
+    },
+),
+
                 ),
 
                 # PANEL DERECHO – Resultados
                 html.Div(
                     [
-                        html.H4("Resultados del modelo"),
-                        html.Div(
-                            id="predicted-price",
-                            style={"fontSize": "20px", "marginBottom": "10px"},
+                        # PANEL IZQUIERDO – Inputs (mejorado con grid)
+# PANEL IZQUIERDO – Inputs (mejorado con grid)
+html.Div(
+    [
+        html.H4("Describe tu alojamiento"),
+
+        html.Div(
+            [
+                # COLUMNA 1
+                html.Div(
+                    [
+                        html.Label("Barrio"),
+                        dcc.Dropdown(
+                            id="inp-neighbourhood",
+                            options=[{"label": n, "value": n} for n in neigh_options],
+                            value=neigh_options[0],
                         ),
-                        html.Div(
-                            id="predicted-recommended",
-                            style={"fontSize": "18px", "marginBottom": "10px"},
+
+                        html.Label("Tipo de propiedad"),
+                        dcc.Dropdown(
+                            id="inp-property-type",
+                            options=[{"label": p, "value": p} for p in ptype_options],
+                            value=ptype_options[0],
                         ),
-                        html.Hr(),
-                        html.Div(id="interpretacion"),
+
+                        html.Label("Superhost"),
+                        dcc.Dropdown(
+                            id="inp-superhost",
+                            options=[
+                                {"label": "Sí", "value": "t"},
+                                {"label": "No", "value": "f"},
+                            ],
+                            value="f",
+                        ),
+
+                        html.Label("Huéspedes (accommodates)"),
+                        dcc.Input(
+                            id="inp-accommodates",
+                            type="number",
+                            value=2,
+                            style={"width": "100%"},
+                        ),
+
+                        html.Label("Habitaciones (bedrooms)"),
+                        dcc.Input(
+                            id="inp-bedrooms",
+                            type="number",
+                            value=1,
+                            style={"width": "100%"},
+                        ),
+
+                        html.Label("Camas (beds)"),
+                        dcc.Input(
+                            id="inp-beds",
+                            type="number",
+                            value=1,
+                            style={"width": "100%"},
+                        ),
                     ],
-                    style={
-                        "width": "60%",
-                        "display": "inline-block",
-                        "padding": "10px",
-                    },
+                    style={"display": "flex", "flexDirection": "column", "gap": "10px"},
+                ),
+
+                # COLUMNA 2
+                html.Div(
+                    [
+                        html.Label("Noche mínima"),
+                        dcc.Input(
+                            id="inp-min-nights",
+                            type="number",
+                            value=1,
+                            style={"width": "100%"},
+                        ),
+
+                        html.Label("Noche máxima"),
+                        dcc.Input(
+                            id="inp-max-nights",
+                            type="number",
+                            value=30,
+                            style={"width": "100%"},
+                        ),
+
+                        html.Label("Precio por persona"),
+                        dcc.Input(
+                            id="inp-price-pp",
+                            type="number",
+                            value=100000,
+                            style={"width": "100%"},
+                        ),
+
+                        html.Label("Tasa de ocupación (0–1)"),
+                        dcc.Slider(
+                            id="inp-occ", min=0, max=1, step=0.01, value=0.7,
+                            tooltip={"placement": "bottom", "always_visible": True},
+                        ),
+
+                        html.Label("Número de reseñas"),
+                        dcc.Input(
+                            id="inp-nreviews",
+                            type="number",
+                            value=10,
+                            style={"width": "100%"},
+                        ),
+
+                        html.Label("Calificación promedio (0–5)"),
+                        dcc.Slider(
+                            id="inp-score", min=0, max=5, step=0.1, value=4.7,
+                            tooltip={"placement": "bottom", "always_visible": True},
+                        ),
+
+                        html.Label("Reseñas por mes"),
+                        dcc.Input(
+                            id="inp-rpm",
+                            type="number",
+                            value=0.5,
+                            style={"width": "100%"},
+                        ),
+
+                        html.Label("Número de listings del host"),
+                        dcc.Input(
+                            id="inp-host-listings",
+                            type="number",
+                            value=1,
+                            style={"width": "100%"},
+                        ),
+                    ],
+                    style={"display": "flex", "flexDirection": "column", "gap": "10px"},
                 ),
             ],
             style={
-                "display": "flex",
-                "gap": "40px",
-                "alignItems": "flex-start",
+                "display": "grid",
+                "gridTemplateColumns": "1fr 1fr",
+                "columnGap": "25px",
+                "rowGap": "15px",
             },
+        ),
+
+        html.Br(),
+        html.Button("Calcular", id="btn-calc", n_clicks=0),
+    ],
+    style={
+        "width": "40%",
+        "display": "inline-block",
+        "verticalAlign": "top",
+        "padding": "15px",
+        "border": "1px solid #ddd",
+        "borderRadius": "10px",
+        "backgroundColor": "#fafafa",
+    },
+),
+
+
         ),
 
         html.Hr(),
@@ -285,26 +493,26 @@ def hacer_prediccion(n_clicks, neigh, ptype, superhost, acc, bed, beds,
             x_input.loc[0, col] = 1
         
 
-    # Escalar con el scaler que entrenaste
+    # Escalar con el scaler
     X_scaled = scaler.transform(x_input[feature_cols].values)
 
     # Predicciones
     price_pred = reg_model.predict(X_scaled)[0][0]
     prob_rec = float(clf_model.predict(X_scaled)[0][0])
 
-    texto_price = f"Precio recomendado: COP ${price_pred:,.0f}"
+    texto_price = f"Precio recomendado: €{price_pred:,.0f}"
     texto_prob = f"Probabilidad de ser 'recommended': {prob_rec*100:,.1f}%"
 
-    if prob_rec > 0.7:
+    if prob_rec == 1:
         mensaje = "Alta probabilidad de estar bien posicionado."
-    elif prob_rec > 0.4:
-        mensaje = "Desempeño medio, con oportunidades de mejora."
-    else:
+    #elif prob_rec > 0.4:
+        #mensaje = "Desempeño medio, con oportunidades de mejora."
+    if prob_rec == 0:
         mensaje = "Baja probabilidad de recomendación con las condiciones actuales."
 
     interpretacion = (
         f"Para un alojamiento en {neigh} de tipo {ptype} con capacidad para {acc} huésped(es), "
-        f"el modelo sugiere un precio alrededor de COP ${price_pred:,.0f} y estima una "
+        f"el modelo sugiere un precio alrededor de €{price_pred:,.0f} y estima una "
         f"probabilidad de {prob_rec*100:,.1f}% de que el anuncio sea recomendado."
     )
 
