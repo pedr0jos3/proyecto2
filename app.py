@@ -226,7 +226,7 @@ app.layout = html.Div(
                                         dcc.Input(
                                             id="inp-rpm",
                                             type="number",
-                                            value=0.5,
+                                            value=1,
                                             style={"width": "100%"},
                                         ),
 
@@ -428,18 +428,18 @@ def hacer_prediccion(n_clicks, neigh, ptype, superhost, acc, bed, beds,
     Input("filtro-barrio", "value"),
 )
 def actualizar_graficas(filtro_barrio):
-    dff = data.copy()
+    # Usar df, que SÍ tiene 'recommended'
+    dff = df.copy()
 
-    # 1. Aplicar filtro solo si es un barrio válido distinto de "ALL"
     if filtro_barrio and filtro_barrio != "ALL":
         if filtro_barrio in dff["neighbourhood_cleansed"].unique():
             dff = dff[dff["neighbourhood_cleansed"] == filtro_barrio]
 
-    # 2. Si por cualquier razón quedó vacío, usar todo el dataset
+    # Si quedó vacío por alguna razón, usar todo df
     if dff.empty:
-        dff = data.copy()
+        dff = df.copy()
 
-    # 3. Gráfica 1 – "Mapa" simplificado: longitud vs latitud
+    # 1. "Mapa" simplificado: longitud vs latitud
     fig_map = px.scatter(
         dff,
         x="longitude",
@@ -450,7 +450,7 @@ def actualizar_graficas(filtro_barrio):
         opacity=0.6,
     )
 
-    # 4. Gráfica 2 – Precio promedio por barrio (sobre el dff filtrado)
+    # 2. Precio promedio por barrio (sobre dff filtrado)
     barrio_stats = dff.groupby("neighbourhood_cleansed").agg(
         avg_price=("price", "mean"),
         avg_occ=("occupancy_rate", "mean"),
@@ -463,12 +463,12 @@ def actualizar_graficas(filtro_barrio):
         title="Precio promedio por barrio",
     )
 
-    # 5. Gráfica 3 – Calificación vs precio por persona
+    # 3. Relación calificación vs precio por persona
     fig_scatter = px.scatter(
         dff,
         x="review_scores",
         y="price_per_person",
-        color="recommended",
+        color="recommended",  # ahora sí existe
         title="Calificación vs precio por persona",
         opacity=0.6,
     )
