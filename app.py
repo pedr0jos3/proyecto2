@@ -327,8 +327,8 @@ def hacer_prediccion(n_clicks, neigh, ptype, superhost, acc, bed, beds,
 
     interpretacion = (
         f"Para un alojamiento en {neigh} de tipo {ptype} con capacidad para {acc} huésped(es), "
-        f"el modelo sugiere un precio alrededor de €{price_pred:,.0f} y estima una {'alta' if prob_rec == 1 else 'baja'} "
-        f"probabilidad de que el anuncio sea recomendado."
+        f"el modelo sugiere un precio alrededor de €{price_pred:,.0f} y estima una "
+        f"probabilidad de {prob_rec*100:,.1f}% de que el anuncio sea recomendado."
     )
 
     return texto_price + mensaje, interpretacion
